@@ -41,7 +41,10 @@ import {
     faBook,
     faMicrochip,
     faSeedling,
+    faTv,
 } from "@fortawesome/free-solid-svg-icons";
+
+import StageView from "./StageView";
 
 function App() {
     const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
@@ -59,6 +62,17 @@ function App() {
     const [ascendingFeed, setAscendingFeed] = useState(true);
     const [errorMsg, setErrorMsg] = useState(null);
 
+    const [isStageView, setIsStageView] = useState(false);
+    const [stageViewOptions, setStageViewOptions] = useState({
+        showDescription: true,
+        showTitle: true,
+        showDuration: true,
+        showViewCount: true,
+        showPublishedAt: true,
+        showCategory: true,
+        showChannelName: true,
+    });
+
     const submitOptions = () => {
         console.log("FINDING VIDEOS");
         // e.preventDefault(); // prevent page reload
@@ -69,7 +83,7 @@ function App() {
     async function fetchVideoData() {
         try {
             const response = await axios.get(
-                `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxResults=${maxVideoResults}&regionCode=${regionCode}&key=${API_KEY}`
+                `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxResults=${maxVideoResults}&regionCode=${regionCode}&key=${API_KEY}`,
             );
             console.log("Video Data:", response.data.items);
             setVideoData(response.data.items);
@@ -82,36 +96,17 @@ function App() {
         }
     }
 
-    // async function fetchVideoCategories() {
-    //     try {
-    //         const response = await axios.get(
-    //             `https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&regionCode=${regionCode}&key=${API_KEY}`
-    //         );
-    //         console.log("Video Category Data:", response.data.items);
-    //         setVideoCategories(response.data.items);
-    //     } catch (error) {
-    //         console.error("Error fetching video category data:", error);
-    //         setVideoCategories(null);
-    //     }
-    // }
-
     const getThumbnailColors = () => {
         const fac = new FastAverageColor();
         videoData.map((video) => {
             fac.getColorAsync(video.snippet.thumbnails.default.url)
                 .then((color) => {
-                    // console.log(
-                    //     `Video #${videoData.indexOf(
-                    //         video
-                    //     )} | Thumbnail Color: ${color.rgba}`
-                    // );
                     let formattedColor = color.rgba.slice(0, -2);
                     formattedColor = formattedColor + "0.35)";
                     setAverageColorThumbnails((prev) => [
                         ...prev,
                         [videoData.indexOf(video), formattedColor],
                     ]);
-                    // console.log(averageColorThumbnails);
                 })
                 .catch((e) => {
                     console.log(e);
@@ -148,12 +143,12 @@ function App() {
             averageColorThumbnails.length === videoData.length
         ) {
             sortedThumbnails = averageColorThumbnails.sort(
-                (a, b) => a[0] - b[0]
+                (a, b) => a[0] - b[0],
             );
             setAverageColorThumbnails(sortedThumbnails);
             console.log(
                 "Updated averageColorThumbnails:",
-                averageColorThumbnails
+                averageColorThumbnails,
             );
             setTimeEnd(performance.now() / 1000);
             setAllLoaded(true);
@@ -330,38 +325,38 @@ function App() {
     };
 
     const videoCategoryIcons = {
-        1: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        2: <FontAwesomeIcon icon={faCar} className="text-xs" />,
-        10: <FontAwesomeIcon icon={faMusic} className="text-xs" />,
-        15: <FontAwesomeIcon icon={faPaw} className="text-xs" />,
-        17: <FontAwesomeIcon icon={faFootball} className="text-xs" />,
-        18: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        19: <FontAwesomeIcon icon={faEarthAmericas} className="text-xs" />,
-        20: <FontAwesomeIcon icon={faGamepad} className="text-xs" />,
-        21: <FontAwesomeIcon icon={faVideo} className="text-xs" />,
-        22: <FontAwesomeIcon icon={faPeopleGroup} className="text-xs" />,
-        23: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        24: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        25: <FontAwesomeIcon icon={faNewspaper} className="text-xs" />,
-        26: <FontAwesomeIcon icon={faHandshakeAngle} className="text-xs" />,
-        27: <FontAwesomeIcon icon={faBook} className="text-xs" />,
-        28: <FontAwesomeIcon icon={faMicrochip} className="text-xs" />,
-        29: <FontAwesomeIcon icon={faSeedling} className="text-xs" />,
-        30: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        31: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        32: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        33: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        34: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        35: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        36: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        37: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        38: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        39: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        40: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        41: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        42: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        43: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
-        44: <FontAwesomeIcon icon={faFilm} className="text-xs" />,
+        1: <FontAwesomeIcon icon={faFilm} />, //className="text-xs"
+        2: <FontAwesomeIcon icon={faCar} />,
+        10: <FontAwesomeIcon icon={faMusic} />,
+        15: <FontAwesomeIcon icon={faPaw} />,
+        17: <FontAwesomeIcon icon={faFootball} />,
+        18: <FontAwesomeIcon icon={faFilm} />,
+        19: <FontAwesomeIcon icon={faEarthAmericas} />,
+        20: <FontAwesomeIcon icon={faGamepad} />,
+        21: <FontAwesomeIcon icon={faVideo} />,
+        22: <FontAwesomeIcon icon={faPeopleGroup} />,
+        23: <FontAwesomeIcon icon={faFilm} />,
+        24: <FontAwesomeIcon icon={faFilm} />,
+        25: <FontAwesomeIcon icon={faNewspaper} />,
+        26: <FontAwesomeIcon icon={faHandshakeAngle} />,
+        27: <FontAwesomeIcon icon={faBook} />,
+        28: <FontAwesomeIcon icon={faMicrochip} />,
+        29: <FontAwesomeIcon icon={faSeedling} />,
+        30: <FontAwesomeIcon icon={faFilm} />,
+        31: <FontAwesomeIcon icon={faFilm} />,
+        32: <FontAwesomeIcon icon={faFilm} />,
+        33: <FontAwesomeIcon icon={faFilm} />,
+        34: <FontAwesomeIcon icon={faFilm} />,
+        35: <FontAwesomeIcon icon={faFilm} />,
+        36: <FontAwesomeIcon icon={faFilm} />,
+        37: <FontAwesomeIcon icon={faFilm} />,
+        38: <FontAwesomeIcon icon={faFilm} />,
+        39: <FontAwesomeIcon icon={faFilm} />,
+        40: <FontAwesomeIcon icon={faFilm} />,
+        41: <FontAwesomeIcon icon={faFilm} />,
+        42: <FontAwesomeIcon icon={faFilm} />,
+        43: <FontAwesomeIcon icon={faFilm} />,
+        44: <FontAwesomeIcon icon={faFilm} />,
     };
 
     const menuStyle = {
@@ -585,7 +580,7 @@ function App() {
                                   </div>
                                   {/* ITEM 2: VIDEO IMG + DETAILS */}
                                   <div
-                                      className="flex flex-col md:flex-row gap-4 p-[10px] w-full transition-all duration-100 rounded-[20px] hover:scale-101" //hover:scale-101 rounded-[0.65rem]
+                                      className="flex flex-col md:flex-row gap-4 p-[10px] w-full transition-all duration-100 rounded-[20px] hover:scale-101 overflow-hidden" //hover:scale-101 rounded-[0.65rem]
                                       onMouseEnter={(e) =>
                                           (e.currentTarget.style.backgroundColor =
                                               averageColorThumbnails[
@@ -606,23 +601,49 @@ function App() {
                                           target="_blank"
                                           className="aspect-video relative"
                                       >
+                                          {!item.statistics.viewCount &&
+                                          item.contentDetails.duration ==
+                                              "P0D" ? (
+                                              <div className="absolute w-full h-full bg-black/100 text-white rounded-[10px] z-10">
+                                                  <div className="flex flex-col justify-center items-center h-full">
+                                                      <p className="text-xl">
+                                                          Video unavailable
+                                                      </p>
+                                                      <p className="text-xs">
+                                                          This video is not
+                                                          available
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                          ) : (
+                                              ""
+                                          )}
                                           <div
-                                              className="absolute bottom-2 right-2 z-10 py-0.5 px-1 bg-black/70 text-white flex justify-center items-center text-sm rounded-sm" /*rounded-sm */
+                                              className="absolute bottom-2 right-2 z-20 pt-0.75 pb-0.5 px-1 bg-[#0f0f0f]/80 text-white flex justify-center items-center text-sm rounded-sm" /*rounded-sm */
                                           >
                                               <div className="leading-3 pb-[.18rem]">
                                                   {getVideoDuration(
                                                       item.contentDetails
-                                                          .duration
+                                                          .duration,
                                                   )}
                                               </div>
                                           </div>
-                                          <img
-                                              src={
-                                                  item.snippet.thumbnails.medium
-                                                      .url
-                                              }
-                                              className={`aspect-video object-cover h-full transition-all duration-100 -z-10 rounded-[10px]`} //rgba(241,241,241,0.2) ${averageColorThumbnails[videoData.indexOf(item)][1]} rounded-lg
-                                          />
+                                          <div className="rounded-[10px] w-full h-full overflow-hidden -z-10">
+                                              <img
+                                                  src={
+                                                      item.snippet.thumbnails
+                                                          .medium.url
+                                                  }
+                                                  className={`aspect-video object-cover h-full transition-all duration-100 ${
+                                                      !item.statistics
+                                                          .viewCount &&
+                                                      item.contentDetails
+                                                          .duration == "P0D"
+                                                          ? "blur-md"
+                                                          : ""
+                                                  }`} //rgba(241,241,241,0.2) ${averageColorThumbnails[videoData.indexOf(item)][1]} rounded-lg
+                                              />
+                                          </div>
                                       </a>
                                       {/* SUBITEM 2: VIDEO DETAILS */}
                                       <div className={`flex flex-col w-full`}>
@@ -644,32 +665,47 @@ function App() {
                                                   <div className="text-xs">
                                                       •
                                                   </div>
-                                                  <div className="flex w-fit">
-                                                      <NumericLabel
-                                                          //paramsThousandsAndBelow paramsMillionsAndAbove
-                                                          params={
-                                                              item.statistics
-                                                                  .viewCount >
-                                                              1000000
-                                                                  ? paramsMillionsAndAbove
-                                                                  : paramsThousandsAndBelow
-                                                          }
-                                                      >
-                                                          {
-                                                              item.statistics
-                                                                  .viewCount
-                                                          }
-                                                      </NumericLabel>
-                                                      <span>&nbsp;views</span>
-                                                  </div>
-                                                  <div className="text-xs">
-                                                      •
-                                                  </div>
+
+                                                  {item.statistics.viewCount ? (
+                                                      <div className="flex w-fit">
+                                                          <NumericLabel
+                                                              //paramsThousandsAndBelow paramsMillionsAndAbove
+                                                              params={
+                                                                  item
+                                                                      .statistics
+                                                                      .viewCount >
+                                                                  1000000
+                                                                      ? paramsMillionsAndAbove
+                                                                      : paramsThousandsAndBelow
+                                                              }
+                                                          >
+                                                              {
+                                                                  item
+                                                                      .statistics
+                                                                      .viewCount
+                                                              }
+                                                          </NumericLabel>
+                                                          <span>
+                                                              &nbsp;views
+                                                          </span>
+                                                      </div>
+                                                  ) : (
+                                                      ""
+                                                  )}
+
+                                                  {item.statistics.viewCount ? (
+                                                      <div className="text-xs">
+                                                          •
+                                                      </div>
+                                                  ) : (
+                                                      ""
+                                                  )}
                                                   <div className="w-fit">
                                                       <ReactTimeAgo
                                                           date={
                                                               new Date(
-                                                                  item.snippet.publishedAt
+                                                                  item.snippet
+                                                                      .publishedAt,
                                                               )
                                                           }
                                                       />
@@ -681,7 +717,7 @@ function App() {
                                                   </div>
                                                   {/* HERE */}
                                                   <div className="text-white/50 flex gap-1 bg-[#aaaaaa]/10 rounded-[5px] w-fit p-0.5 items-center justify-center mt-2">
-                                                      <div className="flex justify-center items-center h-5 w-5">
+                                                      <div className="flex justify-center items-center h-5 w-5 text-xs">
                                                           {
                                                               videoCategoryIcons[
                                                                   item.snippet
@@ -719,9 +755,8 @@ function App() {
         );
     }
 
-    // if (allLoaded === true) {
-    return (
-        <div className="bg-[#0f0f0f]">
+    const defaultView = (
+        <div className={`bg-[#0f0f0f] ${isStageView ? "" : "fade-in"}`}>
             <div className="max-w-[1150px] mx-auto px-2">
                 <div className="text-[#f1f1f1] w-full flex flex-col md:gap-0 gap-4 md:flex-row justify-between pt-10 pb-5 items-center">
                     <div className="flex gap-5 items-center justify-center md:justify-start w-full">
@@ -755,6 +790,23 @@ function App() {
                         <div
                             className="flex gap-1 w-full rounded-l-xl items-center" /*border-r-2 border-[#aaaaaa]/10 bg-[#121212]*/
                         >
+                            <div className="flex items-center pl-1 py-1 pr-1 h-full">
+                                <button
+                                    onClick={() => {
+                                        setIsStageView(true);
+                                    }}
+                                    className="transition-all pr-2 py-2 hover:cursor-pointer pl-2 rounded-lg text-left text-[#f1f1f1] hover:text-[#f1f1f1]/50"
+                                >
+                                    <div className="flex justify-between items-center w-full">
+                                        <div className="flex items-center gap-3">
+                                            <FontAwesomeIcon
+                                                icon={faTv}
+                                                className="text-md"
+                                            />
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
                             <div
                                 className="flex items-center pl-1 py-1 pr-1 h-full" /*border-r-2 border-[#aaaaaa]/10 */
                             >
@@ -830,6 +882,27 @@ function App() {
                 </footer>
             </div>
         </div>
+    );
+
+    // if (allLoaded === true) {
+    return (
+        <>
+            {isStageView ? (
+                <StageView
+                    videoData={videoData}
+                    getVideoDuration={getVideoDuration}
+                    averageColorThumbnails={averageColorThumbnails}
+                    setIsStageView={setIsStageView}
+                    isStageView={isStageView}
+                    setStageViewOptions={setStageViewOptions}
+                    stageViewOptions={stageViewOptions}
+                    videoCategories={videoCategories}
+                    videoCategoryIcons={videoCategoryIcons}
+                />
+            ) : (
+                defaultView
+            )}
+        </>
     );
 }
 

@@ -399,3 +399,16 @@ html {
 .rc-dropdown-placement-bottomRight .rc-dropdown-arrow {
     right: 15%;
 }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 500ms ease-out forwards;
+}
